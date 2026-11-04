@@ -53,8 +53,8 @@ export function WaitingRoomPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-5 py-8">
-        <div className="max-w-md mx-auto flex flex-col items-center gap-7">
+      <div className="flex-1 overflow-y-auto px-5 py-10">
+        <div className="max-w-md mx-auto flex flex-col items-center gap-10">
           {isLoading ? (
             <_LoadingHero />
           ) : isError ? (
@@ -73,24 +73,30 @@ export function WaitingRoomPage() {
               </div>
 
               {/* Countdown card */}
-              <div className="w-full bg-white dark:bg-[#1A1D24] rounded-[20px] border border-black/[0.05] dark:border-white/[0.06] px-6 py-5">
-                <p className="text-[11px] font-bold tracking-[1.2px] text-[#6B7280] dark:text-[#7A8499] uppercase mb-2">
-                  Starts In
-                </p>
-                <p className="text-[36px] font-black tracking-tight tabular-nums text-[#4F7A00] dark:text-[#B5E82C] leading-none mb-4">
-                  {isAnyMoment ? 'Any moment now' : formatted}
-                </p>
-                <div className="h-px bg-black/[0.06] dark:bg-white/[0.06] mb-4" />
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-[#6B7280] dark:text-[#7A8499]" />
-                  <span className="text-[13px] font-semibold text-[#0C0E14] dark:text-white">
-                    Scheduled for {target ? formatScheduled(target) : '—'}
+              <div className="w-full bg-white dark:bg-[#1A1D24] rounded-[20px] border border-black/[0.05] dark:border-white/[0.06] overflow-hidden">
+                {/* Top section: label + countdown — centered */}
+                <div className="px-6 pt-7 pb-6 flex flex-col items-center text-center">
+                  <p className="text-[11px] font-bold tracking-[1.4px] text-[#6B7280] dark:text-[#7A8499] uppercase mb-2">
+                    Starts In
+                  </p>
+                  <p className="text-[42px] font-black tracking-tight tabular-nums text-[#4F7A00] dark:text-[#B5E82C] leading-none">
+                    {isAnyMoment ? 'Any moment…' : formatted}
+                  </p>
+                </div>
+                {/* Divider */}
+                <div className="h-px bg-black/[0.06] dark:bg-white/[0.06]" />
+                {/* Bottom section: scheduled time — centered */}
+                <div className="px-6 py-4 flex items-center justify-center gap-2">
+                  <Clock className="w-3.5 h-3.5 text-[#6B7280] dark:text-[#7A8499] shrink-0" />
+                  <span className="text-[13px] font-semibold text-[#6B7280] dark:text-[#7A8499]">Scheduled for</span>
+                  <span className="text-[13px] font-bold text-[#0C0E14] dark:text-white tabular-nums">
+                    {target ? formatScheduled(target) : '—'}
                   </span>
                 </div>
               </div>
 
-              {/* Info pills */}
-              <div className="w-full flex flex-wrap gap-2.5">
+              {/* Info pills — centered */}
+              <div className="flex flex-wrap gap-2.5 justify-center">
                 <_InfoPill icon={<HelpCircle className="w-3.5 h-3.5" />} label={`${quiz?.questionCount ?? '…'} questions`} />
                 <_InfoPill icon={<DoorOpen className="w-3.5 h-3.5" />} label="Lobby opens 10 min prior" />
               </div>

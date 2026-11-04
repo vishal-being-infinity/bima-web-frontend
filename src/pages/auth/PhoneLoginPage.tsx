@@ -27,8 +27,11 @@ function getVerifier(): RecaptchaVerifier {
 }
 
 function resetVerifier() {
-  recaptchaVerifier?.clear();
+  try { recaptchaVerifier?.clear(); } catch (_) { /* ignore */ }
   recaptchaVerifier = null;
+  // Wipe the DOM node so the next verifier gets a clean anchor
+  const el = document.getElementById('recaptcha-container');
+  if (el) el.innerHTML = '';
 }
 
 export function PhoneLoginPage() {
@@ -91,6 +94,14 @@ export function PhoneLoginPage() {
               Send OTP
             </Button>
           </div>
+
+          {/* reCAPTCHA disclosure — required when badge is hidden */}
+          <p className="text-[11px] text-[#9CA3AF] dark:text-[#4A5568] text-center mt-5 leading-relaxed">
+            Protected by reCAPTCHA —{' '}
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" className="underline">Privacy</a>
+            {' & '}
+            <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer" className="underline">Terms</a>
+          </p>
 
           {/* Invisible reCAPTCHA anchor — must stay in DOM */}
           <div id="recaptcha-container" />

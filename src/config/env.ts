@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'https://bima-project.onrender.com';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 export const FIREBASE_CONFIG = {
   apiKey: 'AIzaSyDphisnr7vX_AODnGR4fvEtBl-TgTM60go',

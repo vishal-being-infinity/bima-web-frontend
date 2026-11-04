@@ -68,6 +68,9 @@ body {
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* Hide reCAPTCHA badge — disclosure text shown on login page instead */
+.grecaptcha-badge { visibility: hidden !important; }
+
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }
