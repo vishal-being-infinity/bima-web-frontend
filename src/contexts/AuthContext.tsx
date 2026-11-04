@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { getMyProfile, type UserModel } from '../api/auth';
@@ -30,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserModel | null>(null);
   const [status, setStatus] = useState<AuthStatus>('loading');
 
-  const fetchProfile = async (fbUser: User) => {
+  const fetchProfile = async (_fbUser: User) => {
     try {
       const profile = await getMyProfile();
       if (profile.blocked) {

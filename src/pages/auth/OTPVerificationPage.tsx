@@ -1,4 +1,5 @@
-import { useState, useRef, KeyboardEvent, ClipboardEvent } from 'react';
+import { useState, useRef } from 'react';
+import type { KeyboardEvent, ClipboardEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { ErrorBanner } from '../../components/ui/ErrorBanner';

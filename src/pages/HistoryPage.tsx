@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { getMyHistory, type HistoryResult } from '../api/quiz';
 import { PageSpinner } from '../components/ui/Spinner';
@@ -81,7 +80,6 @@ function HistoryCard({ result }: { result: HistoryResult }) {
 }
 
 export function HistoryPage() {
-  const [page, setPage] = useState(1);
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['history'],
     queryFn: ({ pageParam = 1 }) => getMyHistory(pageParam as number, 10),

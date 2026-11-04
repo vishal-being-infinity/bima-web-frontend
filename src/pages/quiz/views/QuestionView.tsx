@@ -227,7 +227,7 @@ function SubmitBar({
 
 // ─── Main QuestionView ─────────────────────────────────────────────────────
 
-export function QuestionView({ runtime, quizId, questionResult, onSubmit }: Props) {
+export function QuestionView({ runtime, quizId: _quizId, questionResult, onSubmit }: Props) {
   const q = runtime.question!;
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);

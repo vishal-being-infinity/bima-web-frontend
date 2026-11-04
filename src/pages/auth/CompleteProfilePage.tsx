@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { User, Building2, Hash, ChevronDown } from 'lucide-react';
 import { registerProfile } from '../../api/auth';
 import { Button } from '../../components/ui/Button';
@@ -11,7 +10,6 @@ import { useAuth } from '../../contexts/AuthContext';
 const GENDERS = ['Male', 'Female', 'Other', 'Prefer not to say'];
 
 export function CompleteProfilePage() {
-  const navigate = useNavigate();
   const { reload } = useAuth();
   const [form, setForm] = useState({ fullName: '', gender: '', collegeName: '', rollNumber: '' });
   const [loading, setLoading] = useState(false);
