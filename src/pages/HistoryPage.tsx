@@ -21,11 +21,8 @@ function rankColor(rank: number | null) {
 
 function HistoryCard({ result }: { result: HistoryResult }) {
   const color = rankColor(result.rank);
-  // Rank percentile: how far from last place (lower rank number = better)
-  const rankPct =
-    result.rank != null && result.totalParticipants > 1
-      ? Math.round(((result.totalParticipants - result.rank) / (result.totalParticipants - 1)) * 100)
-      : 0;
+  const maxScore = result.totalQuestions * 1000;
+  const scorePct = maxScore > 0 ? Math.min(100, Math.round((result.score / maxScore) * 100)) : 0;
 
   return (
     <div className="bg-white dark:bg-[#1A1D24] rounded-[20px] border border-black/5 dark:border-white/[0.06] p-4">
@@ -60,21 +57,19 @@ function HistoryCard({ result }: { result: HistoryResult }) {
         </div>
       </div>
 
-      {/* Rank percentile bar */}
-      {result.rank != null && (
-        <div className="mt-3">
-          <div className="flex justify-between text-[11px] font-semibold mb-1.5 text-[#6B7280] dark:text-[#7A8499]">
-            <span>Rank percentile</span>
-            <span>Top {100 - rankPct}%</span>
-          </div>
-          <div className="h-1.5 rounded-full bg-[#F3F4F6] dark:bg-white/[0.06]">
-            <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${rankPct}%`, backgroundColor: color }}
-            />
-          </div>
+      {/* Score progress bar */}
+      <div className="mt-3">
+        <div className="flex justify-between text-[11px] font-semibold mb-1.5 text-[#6B7280] dark:text-[#7A8499]">
+          <span>Score progress</span>
+          <span>{result.score.toLocaleString()} / {maxScore.toLocaleString()} pts</span>
         </div>
-      )}
+        <div className="h-1.5 rounded-full bg-[#F3F4F6] dark:bg-white/[0.06]">
+          <div
+            className="h-full rounded-full transition-all"
+            style={{ width: `${scorePct}%`, backgroundColor: color }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

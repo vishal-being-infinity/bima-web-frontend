@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithPhoneNumber, RecaptchaVerifier, type ConfirmationResult } from 'firebase/auth';
 import { Phone } from 'lucide-react';
@@ -34,17 +34,51 @@ function resetVerifier() {
   if (el) el.innerHTML = '';
 }
 
+const FIREBASE_ERRORS: Record<string, string> = {
+  'auth/too-many-requests': 'Too many attempts — please wait a few minutes before trying again.',
+  'auth/invalid-phone-number': 'Invalid phone number. Include country code or use a 10-digit Indian number.',
+  'auth/quota-exceeded': 'SMS quota exceeded. Please try again later.',
+  'auth/network-request-failed': 'Network error. Check your connection and retry.',
+  'auth/captcha-check-failed': 'Verification failed. Please refresh the page and try again.',
+  'auth/missing-phone-number': 'Enter a phone number to continue.',
+};
+
+function friendlyError(err: unknown): string {
+  if (err && typeof err === 'object' && 'code' in err) {
+    const code = (err as { code: string }).code;
+    return FIREBASE_ERRORS[code] ?? `Something went wrong (${code})`;
+  }
+  return err instanceof Error ? err.message : 'Failed to send OTP';
+}
+
+const COOLDOWN_SECS = 60;
+
 export function PhoneLoginPage() {
   const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [cooldown, setCooldown] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
+
+  const startCooldown = () => {
+    setCooldown(COOLDOWN_SECS);
+    timerRef.current = setInterval(() => {
+      setCooldown((s) => {
+        if (s <= 1) { clearInterval(timerRef.current!); timerRef.current = null; return 0; }
+        return s - 1;
+      });
+    }, 1000);
+  };
 
   const handleSendOtp = async () => {
     if (!phone || phone.length < 10) {
       setError('Enter a valid phone number');
       return;
     }
+    if (cooldown > 0) return;
     setError('');
     setLoading(true);
 
@@ -52,11 +86,16 @@ export function PhoneLoginPage() {
       const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`;
       const result = await signInWithPhoneNumber(auth, formattedPhone, getVerifier());
       window.confirmationResult = result;
+      startCooldown();
       navigate('/auth/otp', { state: { phone: formattedPhone } });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to send OTP';
-      setError(msg);
+      setError(friendlyError(err));
       resetVerifier();
+      // Start cooldown on rate-limit so user can't keep hammering
+      if (err && typeof err === 'object' && 'code' in err &&
+          (err as { code: string }).code === 'auth/too-many-requests') {
+        startCooldown();
+      }
     } finally {
       setLoading(false);
     }
@@ -90,8 +129,8 @@ export function PhoneLoginPage() {
               onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()}
             />
 
-            <Button fullWidth loading={loading} onClick={handleSendOtp}>
-              Send OTP
+            <Button fullWidth loading={loading} disabled={cooldown > 0} onClick={handleSendOtp}>
+              {cooldown > 0 ? `Resend in ${cooldown}s` : 'Send OTP'}
             </Button>
           </div>
 
