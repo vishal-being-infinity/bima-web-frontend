@@ -19,7 +19,12 @@ export interface RegisterProfileRequest {
   gender: string;
   collegeName: string;
   rollNumber: string;
+  email: string;
 }
+
+export const createSession = async (): Promise<void> => {
+  await apiClient.post('/auth/session');
+};
 
 export const getMyProfile = async (): Promise<UserModel> => {
   const res = await apiClient.get('/auth/me');

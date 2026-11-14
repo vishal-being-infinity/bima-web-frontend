@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Building2, Hash, ChevronDown } from 'lucide-react';
+import { User, Building2, Hash, Mail, ChevronDown } from 'lucide-react';
 import { registerProfile } from '../../api/auth';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -7,11 +7,11 @@ import { ErrorBanner } from '../../components/ui/ErrorBanner';
 import { BrandLogo } from '../../components/layout/BrandLogo';
 import { useAuth } from '../../contexts/AuthContext';
 
-const GENDERS = ['Male', 'Female', 'Other', 'Prefer not to say'];
+const GENDERS = ['Male', 'Female', 'Other'];
 
 export function CompleteProfilePage() {
   const { reload } = useAuth();
-  const [form, setForm] = useState({ fullName: '', gender: '', collegeName: '', rollNumber: '' });
+  const [form, setForm] = useState({ fullName: '', gender: '', collegeName: '', rollNumber: '', email: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [step, setStep] = useState(0);
@@ -19,17 +19,25 @@ export function CompleteProfilePage() {
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   const handleSubmit = async () => {
-    const { fullName, gender, collegeName, rollNumber } = form;
-    if (!fullName || !gender || !collegeName || !rollNumber) {
+    const { fullName, gender, collegeName, rollNumber, email } = form;
+    if (!fullName || !gender || !collegeName || !rollNumber || !email) {
       setError('All fields are required'); return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError('Enter a valid email address'); return;
     }
     setError('');
     setLoading(true);
     try {
-      await registerProfile({ fullName, gender, collegeName, rollNumber });
+      await registerProfile({ fullName, gender, collegeName, rollNumber, email: email.trim() });
       await reload();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to save profile');
+      // Extract backend error message from axios response body
+      const axiosErr = err as { response?: { data?: { error?: string; message?: string }; status?: number } };
+      const backendMsg = axiosErr?.response?.data?.error ?? axiosErr?.response?.data?.message;
+      const status = axiosErr?.response?.status;
+      console.error('[registerProfile]', status, axiosErr?.response?.data);
+      setError(backendMsg ?? (err instanceof Error ? err.message : 'Failed to save profile'));
     } finally {
       setLoading(false);
     }
@@ -111,6 +119,14 @@ export function CompleteProfilePage() {
                 value={form.rollNumber}
                 onChange={(e) => set('rollNumber', e.target.value)}
                 prefix={<Hash className="w-4 h-4" />}
+              />
+              <Input
+                label="Email address"
+                type="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) => set('email', e.target.value)}
+                prefix={<Mail className="w-4 h-4" />}
               />
 
               <div className="flex gap-3">

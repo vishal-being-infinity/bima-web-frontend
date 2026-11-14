@@ -7,6 +7,7 @@ import { OTPVerificationPage } from './pages/auth/OTPVerificationPage';
 import { CompleteProfilePage } from './pages/auth/CompleteProfilePage';
 import { BlockedPage } from './pages/auth/BlockedPage';
 import { WaitingApprovalPage } from './pages/auth/WaitingApprovalPage';
+import { SessionConflictPage } from './pages/auth/SessionConflictPage';
 import { HomePage } from './pages/HomePage';
 import { HistoryPage } from './pages/HistoryPage';
 import { NotificationsPage } from './pages/NotificationsPage';
@@ -18,7 +19,7 @@ import { PageSpinner } from './components/ui/Spinner';
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } });
 
 function AppRoutes() {
-  const { status } = useAuth();
+  const { status, sessionConflictMessage } = useAuth();
 
   if (status === 'loading') {
     return (
@@ -28,6 +29,7 @@ function AppRoutes() {
     );
   }
 
+  if (status === 'sessionConflict') return <SessionConflictPage message={sessionConflictMessage} />;
   if (status === 'blocked') return <BlockedPage />;
   if (status === 'pendingApproval') return <WaitingApprovalPage />;
   if (status === 'profileIncomplete') return <CompleteProfilePage />;

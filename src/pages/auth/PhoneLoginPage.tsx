@@ -20,7 +20,8 @@ let recaptchaVerifier: RecaptchaVerifier | null = null;
 function getVerifier(): RecaptchaVerifier {
   if (!recaptchaVerifier) {
     recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      size: 'invisible',
+      // Visible checkbox in dev (more reliable on localhost), invisible in prod
+      size: import.meta.env.DEV ? 'normal' : 'invisible',
     });
   }
   return recaptchaVerifier;
@@ -142,8 +143,8 @@ export function PhoneLoginPage() {
             <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer" className="underline">Terms</a>
           </p>
 
-          {/* Invisible reCAPTCHA anchor — must stay in DOM */}
-          <div id="recaptcha-container" />
+          {/* reCAPTCHA anchor — visible checkbox in dev, invisible badge in prod */}
+          <div id="recaptcha-container" className={import.meta.env.DEV ? 'mt-4 flex justify-center' : ''} />
         </div>
 
         <p className="text-center mt-6 text-sm text-[#6B7280] dark:text-[#7A8499]">
